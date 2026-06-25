@@ -1,0 +1,60 @@
+name: Build release APK
+
+# Run manually from Actions, then download the APK from the run's artifacts.
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build APK (release, debug-signed)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Fetch dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      # Release builds use the debug keystore for testing.
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Check APK requests no permissions
+        run: |
+          SDK_BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)
+          AAPT="$ANDROID_HOME/build-tools/$SDK_BUILD_TOOLS/aapt"
+          PERMISSIONS=$("$AAPT" dump permissions build/app/outputs/flutter-apk/app-release.apk | grep -c "uses-permission" || true)
+          echo "uses-permission entries: $PERMISSIONS"
+          if [ "$PERMISSIONS" -ne 0 ]; then
+            "$AAPT" dump permissions build/app/outputs/flutter-apk/app-release.apk
+            echo "::error::Release APK requests permissions but should request none (especially not INTERNET)."
+            exit 1
+          fi
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shopping-list-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 30

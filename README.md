@@ -1,17 +1,26 @@
-# shopping_list
+# Shopping List
 
-A new Flutter project.
+A small offline shopping list app for Android, built with Flutter and Material 3.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- Add, tick, reorder, and remove items. Removed items can be restored with undo.
+- Share the list as text with checked and unchecked boxes.
+- Choose from six colour palettes and light, dark, or system mode.
+- Use a resizable home-screen widget to tick items off and move them up or down.
+- The widget's plus button opens the app's add sheet.
+- The release APK requests no Android system permissions. The build workflow checks the release APK for system permission requests.
 
-A few resources to get you started if this is your first Flutter project:
+## Storage
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+The list and theme settings live in one Android SharedPreferences file. Flutter reads and writes it through a MethodChannel, and the home-screen widget uses the same file.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Building
+
+```sh
+flutter pub get
+flutter test
+flutter build apk --release
+```
+
+The APK is signed with debug keys. To build it in GitHub Actions, run the Build release APK workflow and download the APK from the run's artifacts.
