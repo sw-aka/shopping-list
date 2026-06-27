@@ -46,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Future<void> _showAddSheet() async {
     final controller = TextEditingController();
+    final focusNode = FocusNode();
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -61,17 +62,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             Expanded(
               child: TextField(
                 controller: controller,
+                focusNode: focusNode,
                 autofocus: true,
                 textCapitalization: TextCapitalization.sentences,
                 textInputAction: TextInputAction.done,
                 decoration: const InputDecoration(hintText: 'Add an item…'),
                 onSubmitted: (value) {
                   state.add(value);
-                  if (value.trim().isNotEmpty) {
-                    // Keep the sheet open so several items can be added
-                    // in a row.
-                    controller.clear();
-                  }
+                  // Keep the sheet open for the next item.
+                  controller.clear();
+                  focusNode.requestFocus();
                 },
               ),
             ),
@@ -82,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               onPressed: () {
                 state.add(controller.text);
                 controller.clear();
+                focusNode.requestFocus();
               },
             ),
           ],
@@ -91,6 +92,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // Save any text left in the field when it closes.
     state.add(controller.text);
     controller.dispose();
+    focusNode.dispose();
   }
 
   void _showThemeSheet() {
