@@ -50,10 +50,19 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Ticked items go to the bottom. Unticked items rejoin the active section.
   void toggle(String id) {
-    _items = [
-      for (final i in _items) i.id == id ? i.copyWith(done: !i.done) : i
-    ];
+    final index = _items.indexWhere((i) => i.id == id);
+    if (index < 0) return;
+    final updated = _items[index].copyWith(done: !_items[index].done);
+    final list = [..._items]..removeAt(index);
+    if (updated.done) {
+      list.add(updated);
+    } else {
+      final firstDone = list.indexWhere((i) => i.done);
+      list.insert(firstDone < 0 ? list.length : firstDone, updated);
+    }
+    _items = list;
     _persist();
     notifyListeners();
   }

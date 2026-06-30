@@ -41,17 +41,35 @@ void main() {
     expect(state.items.map((i) => i.name), ['Milk', 'Eggs']);
 
     state.toggle(state.items.first.id);
-    expect(state.items.first.done, true);
     expect(state.doneCount, 1);
+    expect(state.items.map((i) => i.name), ['Eggs', 'Milk']);
+    expect(state.items.last.done, true);
 
-    final removedId = state.items.first.id;
+    final removedId = state.items.last.id;
     state.remove(removedId);
     expect(state.items.length, 1);
 
     state.undoRemove();
     expect(state.items.length, 2);
-    expect(state.items.first.name, 'Milk');
-    expect(state.items.first.done, true);
+    expect(state.items.last.name, 'Milk');
+    expect(state.items.last.done, true);
+  });
+
+  test('ticking moves to bottom, unticking rejoins active section', () async {
+    final state = newState();
+    for (final name in ['A', 'B', 'C', 'D']) {
+      state.add(name);
+    }
+    String idOf(String name) =>
+        state.items.firstWhere((i) => i.name == name).id;
+
+    state.toggle(idOf('B'));
+    state.toggle(idOf('A'));
+    expect(state.items.map((i) => i.name), ['C', 'D', 'B', 'A']);
+
+    state.toggle(idOf('B'));
+    expect(state.items.map((i) => i.name), ['C', 'D', 'B', 'A']);
+    expect(state.items.map((i) => i.done), [false, false, false, true]);
   });
 
   test('reorder moves item down and up', () async {
