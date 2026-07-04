@@ -23,8 +23,11 @@ class Store {
       _channel.invokeMethod('saveTheme',
           {'mode': mode, 'palette': palette, 'accent': accentArgb});
 
-  /// Returns and clears a pending launch action, e.g. 'add' when the user
-  /// tapped the + button on the widget.
+  /// Adds a tick to the widget's undo history.
+  Future<void> pushUndo(String id) =>
+      _channel.invokeMethod('pushUndo', {'id': id});
+
+  /// Returns and clears a pending launch_action intent extra.
   Future<String?> takeLaunchAction() async =>
       await _channel.invokeMethod<String>('takeLaunchAction');
 }

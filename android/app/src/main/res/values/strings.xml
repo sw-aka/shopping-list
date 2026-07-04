@@ -4,6 +4,8 @@
     <string name="widget_title">Shopping</string>
     <string name="widget_description">Your shopping list: tick items off, reorder them and add new ones without opening the app.</string>
     <string name="widget_empty">List is empty, tap + to add</string>
+    <string name="widget_all_done">All ticked off, nice work</string>
+    <string name="widget_undo">Undo last tick</string>
     <string name="widget_add">Add item</string>
     <string name="widget_toggle">Toggle item</string>
     <string name="widget_move_up">Move up</string>

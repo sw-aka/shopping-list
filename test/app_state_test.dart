@@ -24,6 +24,7 @@ void main() {
         case 'saveTheme':
           saved['theme'] = Map<Object?, Object?>.from(call.arguments as Map);
           return null;
+        case 'pushUndo':
         case 'takeLaunchAction':
           return null;
       }

@@ -21,6 +21,7 @@ class ListWidgetProvider : AppWidgetProvider() {
 
     companion object {
         const val ACTION_ITEM = "dev.samuel.shopping_list.WIDGET_ITEM"
+        const val ACTION_UNDO = "dev.samuel.shopping_list.WIDGET_UNDO"
         const val EXTRA_ITEM_ID = "item_id"
         const val EXTRA_OP = "op"
         const val OP_TOGGLE = "toggle"
@@ -68,6 +69,38 @@ class ListWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(
                 R.id.widget_count,
                 if (items.length() == 0) "" else "$done/${items.length()}"
+            )
+            views.setTextViewText(
+                R.id.widget_empty,
+                context.getString(
+                    if (items.length() > 0 && done == items.length())
+                        R.string.widget_all_done
+                    else
+                        R.string.widget_empty
+                )
+            )
+
+            // Ignore undo entries for deleted or already unticked items.
+            val undoable = Prefs.loadUndoIds(context).any { id ->
+                (0 until items.length()).any {
+                    items.optJSONObject(it)?.optString("id") == id &&
+                        items.optJSONObject(it)?.optBoolean("done") == true
+                }
+            }
+            views.setViewVisibility(
+                R.id.widget_undo,
+                if (undoable) android.view.View.VISIBLE else android.view.View.GONE
+            )
+            views.setInt(R.id.widget_undo, "setColorFilter", subColor)
+            val undoIntent = Intent(context, ListWidgetProvider::class.java).apply {
+                action = ACTION_UNDO
+            }
+            views.setOnClickPendingIntent(
+                R.id.widget_undo,
+                PendingIntent.getBroadcast(
+                    context, 3, undoIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             )
 
             val adapterIntent = Intent(context, ListWidgetService::class.java).apply {
@@ -127,31 +160,71 @@ class ListWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action != ACTION_ITEM) return
+        when (intent.action) {
+            ACTION_ITEM -> handleItem(context, intent)
+            ACTION_UNDO -> handleUndo(context)
+        }
+    }
+
+    private fun handleItem(context: Context, intent: Intent) {
         val itemId = intent.getStringExtra(EXTRA_ITEM_ID) ?: return
         val op = intent.getStringExtra(EXTRA_OP) ?: return
 
-        val items = Prefs.loadItems(context)
-        val index = (0 until items.length())
-            .firstOrNull { items.optJSONObject(it)?.optString("id") == itemId }
-            ?: return
+        val list = toList(Prefs.loadItems(context))
+        val index = list.indexOfFirst { it.optString("id") == itemId }
+        if (index < 0) return
 
         when (op) {
+            // Ticked items leave the widget and enter the undo history.
             OP_TOGGLE -> {
-                val item = items.getJSONObject(index)
-                item.put("done", !item.optBoolean("done"))
+                val item = list.removeAt(index)
+                item.put("done", true)
+                list.add(item)
+                Prefs.pushUndoId(context, itemId)
             }
-            OP_UP -> if (index > 0) swap(items, index, index - 1)
-            OP_DOWN -> if (index < items.length() - 1) swap(items, index, index + 1)
+            // Reorder relative to the neighbouring *visible* item, so hidden
+            // ticked items are never swapped with.
+            OP_UP -> {
+                val prev = (index - 1 downTo 0)
+                    .firstOrNull { !list[it].optBoolean("done") } ?: return
+                list.add(prev, list.removeAt(index))
+            }
+            OP_DOWN -> {
+                val next = (index + 1 until list.size)
+                    .firstOrNull { !list[it].optBoolean("done") } ?: return
+                list.add(next, list.removeAt(index))
+            }
             else -> return
         }
-        Prefs.saveItems(context, items)
+        Prefs.saveItems(context, toJson(list))
         refreshAll(context)
     }
 
-    private fun swap(items: JSONArray, a: Int, b: Int) {
-        val tmp = items.get(a)
-        items.put(a, items.get(b))
-        items.put(b, tmp)
+    /** Skips stale undo ids and restores the most recent valid tick. */
+    private fun handleUndo(context: Context) {
+        val list = toList(Prefs.loadItems(context))
+        val undo = Prefs.loadUndoIds(context)
+        while (undo.isNotEmpty()) {
+            val id = undo.removeAt(0)
+            val index = list.indexOfFirst {
+                it.optString("id") == id && it.optBoolean("done")
+            }
+            if (index < 0) continue
+            val item = list.removeAt(index)
+            item.put("done", false)
+            val firstDone = list.indexOfFirst { it.optBoolean("done") }
+            list.add(if (firstDone < 0) list.size else firstDone, item)
+            Prefs.saveItems(context, toJson(list))
+            break
+        }
+        Prefs.saveUndoIds(context, undo)
+        refreshAll(context)
     }
+
+    private fun toList(items: JSONArray): MutableList<org.json.JSONObject> =
+        (0 until items.length()).mapNotNull { items.optJSONObject(it) }
+            .toMutableList()
+
+    private fun toJson(list: List<org.json.JSONObject>): JSONArray =
+        JSONArray().also { array -> list.forEach { array.put(it) } }
 }

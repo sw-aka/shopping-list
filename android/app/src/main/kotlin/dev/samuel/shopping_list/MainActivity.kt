@@ -60,6 +60,11 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
 
+                "pushUndo" -> {
+                    call.argument<String>("id")?.let { Prefs.pushUndoId(this, it) }
+                    result.success(null)
+                }
+
                 "takeLaunchAction" -> {
                     result.success(pendingLaunchAction)
                     pendingLaunchAction = null

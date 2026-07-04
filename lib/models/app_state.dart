@@ -58,6 +58,7 @@ class AppState extends ChangeNotifier {
     final list = [..._items]..removeAt(index);
     if (updated.done) {
       list.add(updated);
+      _store.pushUndo(id);
     } else {
       final firstDone = list.indexWhere((i) => i.done);
       list.insert(firstDone < 0 ? list.length : firstDone, updated);

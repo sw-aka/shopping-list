@@ -24,7 +24,10 @@ private class ListRemoteViewsFactory(
 
     override fun onDataSetChanged() {
         val array = Prefs.loadItems(context)
-        items = (0 until array.length()).mapNotNull { array.optJSONObject(it) }
+        // The widget shows active items only. Undo is in the header.
+        items = (0 until array.length())
+            .mapNotNull { array.optJSONObject(it) }
+            .filterNot { it.optBoolean("done") }
     }
 
     override fun onDestroy() = Unit

@@ -7,7 +7,7 @@ A small offline shopping list app for Android, built with Flutter and Material 3
 - Add, tick, reorder, and remove items. Removed items can be restored with undo.
 - Share the list as text with checked and unchecked boxes.
 - Choose from six colour palettes and light, dark, or system mode.
-- Use a resizable home-screen widget to tick items off and move them up or down.
+- Use a resizable home-screen widget. Ticking an item hides it; the header can undo up to three recent ticks. Items can be moved up or down.
 - The widget's plus button opens the app's add sheet.
 - The release APK requests no Android system permissions. The build workflow checks the release APK for system permission requests.
 
