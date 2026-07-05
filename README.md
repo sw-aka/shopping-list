@@ -23,4 +23,4 @@ flutter test
 flutter build apk --release
 ```
 
-The APK is signed with debug keys. To build it in GitHub Actions, run the Build release APK workflow and download the APK from the run's artifacts.
+The APK is signed with debug keys. To build it in GitHub Actions, run the Build release APK workflow. It publishes `shopping-list-build-<run number>.apk` on the Releases page under a `build-<run number>` tag.
