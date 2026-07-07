@@ -11,12 +11,7 @@ import android.net.Uri
 import android.widget.RemoteViews
 import org.json.JSONArray
 
-/**
- * Resizable home-screen widget. Rows are served by [ListWidgetService];
- * taps come back here as broadcasts (toggle, move up, move down) and are
- * applied straight to the shared store, so the Flutter app picks them up
- * on next resume.
- */
+/** Widget taps update the shared store, which Flutter reloads on resume. */
 class ListWidgetProvider : AppWidgetProvider() {
 
     companion object {
@@ -25,8 +20,6 @@ class ListWidgetProvider : AppWidgetProvider() {
         const val EXTRA_ITEM_ID = "item_id"
         const val EXTRA_OP = "op"
         const val OP_TOGGLE = "toggle"
-        const val OP_UP = "up"
-        const val OP_DOWN = "down"
 
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
@@ -181,18 +174,6 @@ class ListWidgetProvider : AppWidgetProvider() {
                 item.put("done", true)
                 list.add(item)
                 Prefs.pushUndoId(context, itemId)
-            }
-            // Reorder relative to the neighbouring *visible* item, so hidden
-            // ticked items are never swapped with.
-            OP_UP -> {
-                val prev = (index - 1 downTo 0)
-                    .firstOrNull { !list[it].optBoolean("done") } ?: return
-                list.add(prev, list.removeAt(index))
-            }
-            OP_DOWN -> {
-                val next = (index + 1 until list.size)
-                    .firstOrNull { !list[it].optBoolean("done") } ?: return
-                list.add(next, list.removeAt(index))
             }
             else -> return
         }

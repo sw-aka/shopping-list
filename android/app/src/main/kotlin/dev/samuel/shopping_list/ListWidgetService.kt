@@ -63,16 +63,13 @@ private class ListRemoteViewsFactory(
         views.setTextViewText(R.id.item_name, text)
         views.setTextColor(R.id.item_name, if (done) doneColor else textColor)
 
-        views.setInt(R.id.item_up, "setColorFilter", chevronColor)
-        views.setInt(R.id.item_down, "setColorFilter", chevronColor)
-
-        fun fillIn(op: String) = Intent().apply {
-            putExtra(ListWidgetProvider.EXTRA_ITEM_ID, id)
-            putExtra(ListWidgetProvider.EXTRA_OP, op)
-        }
-        views.setOnClickFillInIntent(R.id.item_body, fillIn(ListWidgetProvider.OP_TOGGLE))
-        views.setOnClickFillInIntent(R.id.item_up, fillIn(ListWidgetProvider.OP_UP))
-        views.setOnClickFillInIntent(R.id.item_down, fillIn(ListWidgetProvider.OP_DOWN))
+        views.setOnClickFillInIntent(
+            R.id.item_body,
+            Intent().apply {
+                putExtra(ListWidgetProvider.EXTRA_ITEM_ID, id)
+                putExtra(ListWidgetProvider.EXTRA_OP, ListWidgetProvider.OP_TOGGLE)
+            }
+        )
         return views
     }
 

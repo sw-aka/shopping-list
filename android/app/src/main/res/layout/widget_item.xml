@@ -34,20 +34,4 @@
             android:maxLines="2"
             android:ellipsize="end" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/item_up"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:padding="5dp"
-        android:src="@drawable/ic_up"
-        android:contentDescription="@string/widget_move_up" />
-
-    <ImageView
-        android:id="@+id/item_down"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:padding="5dp"
-        android:src="@drawable/ic_down"
-        android:contentDescription="@string/widget_move_down" />
 </LinearLayout>
