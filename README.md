@@ -8,7 +8,7 @@ A small offline shopping list app for Android, built with Flutter and Material 3
 - Share the list as text with checked and unchecked boxes.
 - Choose from six colour palettes and light, dark, or system mode.
 - Use a resizable home-screen widget. Ticking an item hides it; the header can undo up to three recent ticks.
-- The widget's plus button opens the app's add sheet.
+- The widget's plus button opens a small native add field over the home screen without opening the Flutter screen.
 - The release APK requests no Android system permissions. The build workflow checks the release APK for system permission requests.
 
 ## Storage

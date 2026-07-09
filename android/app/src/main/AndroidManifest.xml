@@ -25,6 +25,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- No taskAffinity override keeps quick-add out of the main app task. -->
+        <activity
+            android:name=".QuickAddActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/QuickAddTheme"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
         <receiver
             android:name=".ListWidgetProvider"
             android:exported="false"

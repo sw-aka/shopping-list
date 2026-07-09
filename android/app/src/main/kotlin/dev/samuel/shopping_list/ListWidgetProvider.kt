@@ -115,10 +115,9 @@ class ListWidgetProvider : AppWidgetProvider() {
                 )
             )
 
-            // + button opens the app straight into the add sheet.
-            val addIntent = Intent(context, MainActivity::class.java).apply {
-                putExtra(MainActivity.EXTRA_LAUNCH_ACTION, "add")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            // Use a separate activity so quick-add does not open the Flutter screen.
+            val addIntent = Intent(context, QuickAddActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
             views.setOnClickPendingIntent(
                 R.id.widget_add,
