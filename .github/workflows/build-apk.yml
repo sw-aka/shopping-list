@@ -1,16 +1,18 @@
-name: Build release APK
+name: Android build check
 
-# Run manually from Actions. The APK is published on the Releases page
-# under build-<run number>.
+# Check changes on main and allow manual checks before merging.
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
-  contents: write # to publish the GitHub release
+  contents: read
 
 jobs:
   build:
-    name: Build APK (release, debug-signed)
+    name: Check Android APK
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -39,7 +41,7 @@ jobs:
       - name: Run tests
         run: flutter test
 
-      # Release builds use the debug keystore for testing.
+      # Debug signing keeps this check independent of signing credentials.
       - name: Build release APK
         run: flutter build apk --release
 
@@ -62,18 +64,3 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 30
-
-      - name: Rename APK for the release
-        run: cp build/app/outputs/flutter-apk/app-release.apk shopping-list-build-${{ github.run_number }}.apk
-
-      # Publish each build on the Releases page.
-      - name: Publish GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: build-${{ github.run_number }}
-          name: Shopping List build ${{ github.run_number }}
-          body: |
-            Debug-signed release APK built from ${{ github.sha }}.
-            Requests no system permissions (offline-only).
-          files: shopping-list-build-${{ github.run_number }}.apk
-          make_latest: true
