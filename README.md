@@ -9,7 +9,7 @@ A small offline shopping list app for Android, built with Flutter and Material 3
 - Choose from six colour palettes and light, dark, or system mode.
 - Use a resizable home-screen widget. Ticking an item hides it; the header can undo up to three recent ticks.
 - The widget's plus button opens a small native add field over the home screen without opening the Flutter screen.
-- The release APK requests no Android system permissions. The build workflow checks the release APK for system permission requests.
+- The app requests no Android system permissions.
 
 ## Storage
 
@@ -19,8 +19,7 @@ The list and theme settings live in one Android SharedPreferences file. Flutter 
 
 ```sh
 flutter pub get
+flutter analyze
 flutter test
 flutter build apk --release
 ```
-
-The APK is signed with debug keys. To build it in GitHub Actions, run the Build release APK workflow. It publishes `shopping-list-build-<run number>.apk` on the Releases page under a `build-<run number>` tag.
