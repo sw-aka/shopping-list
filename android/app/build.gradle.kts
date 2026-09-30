@@ -27,9 +27,22 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Keep debug signing available for CI when environment signing settings are absent.
+            val keystore = System.getenv("SHOPPING_LIST_KEYSTORE")
+            signingConfig = if (keystore != null) {
+                val password = System.getenv("SHOPPING_LIST_KEYSTORE_PASSWORD")
+                    ?: throw GradleException("SHOPPING_LIST_KEYSTORE_PASSWORD is required when SHOPPING_LIST_KEYSTORE is set")
+                val alias = System.getenv("SHOPPING_LIST_KEY_ALIAS")
+                    ?: throw GradleException("SHOPPING_LIST_KEY_ALIAS is required when SHOPPING_LIST_KEYSTORE is set")
+                signingConfigs.create("release") {
+                    storeFile = file(keystore)
+                    storePassword = password
+                    keyPassword = password
+                    keyAlias = alias
+                }
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
