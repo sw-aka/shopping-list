@@ -1,4 +1,4 @@
-package dev.samuel.shopping_list
+package com.alldeploy.shoppinglist
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -15,8 +15,8 @@ import org.json.JSONArray
 class ListWidgetProvider : AppWidgetProvider() {
 
     companion object {
-        const val ACTION_ITEM = "dev.samuel.shopping_list.WIDGET_ITEM"
-        const val ACTION_UNDO = "dev.samuel.shopping_list.WIDGET_UNDO"
+        const val ACTION_ITEM = "com.alldeploy.shoppinglist.WIDGET_ITEM"
+        const val ACTION_UNDO = "com.alldeploy.shoppinglist.WIDGET_UNDO"
         const val EXTRA_ITEM_ID = "item_id"
         const val EXTRA_OP = "op"
         const val OP_TOGGLE = "toggle"

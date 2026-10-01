@@ -1,4 +1,4 @@
-package dev.samuel.shopping_list
+package com.alldeploy.shoppinglist
 
 import android.content.Context
 import android.content.SharedPreferences
