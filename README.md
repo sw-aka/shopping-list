@@ -23,3 +23,7 @@ flutter analyze
 flutter test
 flutter build apk --release
 ```
+
+## Licence
+
+GNU Affero General Public License v3.0. See [LICENSE](LICENSE).
