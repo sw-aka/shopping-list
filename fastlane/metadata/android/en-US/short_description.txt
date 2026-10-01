@@ -1,0 +1,1 @@
+Offline shopping list with a home-screen widget. No permissions, no tracking.
