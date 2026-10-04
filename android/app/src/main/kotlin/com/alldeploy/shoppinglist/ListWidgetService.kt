@@ -2,9 +2,6 @@ package com.alldeploy.shoppinglist
 
 import android.content.Context
 import android.content.Intent
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.StrikethroughSpan
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import org.json.JSONObject
@@ -39,29 +36,17 @@ private class ListRemoteViewsFactory(
         val item = items.getOrNull(position) ?: return views
         val id = item.optString("id")
         val name = item.optString("name")
-        val done = item.optBoolean("done")
 
         val dark = ListWidgetProvider.darkMode(context)
-        val accent = Prefs.accent(context)
         val textColor = if (dark) 0xFFECECEC.toInt() else 0xFF1B1B1B.toInt()
-        val doneColor = if (dark) 0xFF808080.toInt() else 0xFF9E9E9E.toInt()
         val chevronColor = if (dark) 0xFF6E6E6E.toInt() else 0xFFB0B0B0.toInt()
 
-        views.setImageViewResource(
-            R.id.item_check,
-            if (done) R.drawable.ic_check_on else R.drawable.ic_check_off
-        )
-        views.setInt(R.id.item_check, "setColorFilter", if (done) accent else chevronColor)
+        // Only active items reach this factory, so the tick is always unticked.
+        views.setImageViewResource(R.id.item_check, R.drawable.ic_check_off)
+        views.setInt(R.id.item_check, "setColorFilter", chevronColor)
 
-        val text = if (done) {
-            SpannableString(name).apply {
-                setSpan(StrikethroughSpan(), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-        } else {
-            SpannableString(name)
-        }
-        views.setTextViewText(R.id.item_name, text)
-        views.setTextColor(R.id.item_name, if (done) doneColor else textColor)
+        views.setTextViewText(R.id.item_name, name)
+        views.setTextColor(R.id.item_name, textColor)
 
         views.setOnClickFillInIntent(
             R.id.item_body,

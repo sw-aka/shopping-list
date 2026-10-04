@@ -1,10 +1,11 @@
 name: Android build check
 
-# Check changes on main and allow manual checks before merging.
+# Check changes on main and on every pull request; also allow manual checks.
 on:
   push:
     branches:
       - main
+  pull_request:
   workflow_dispatch:
 
 permissions:
